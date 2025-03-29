@@ -21,8 +21,6 @@ locals {
     } : {},
     var.custom_event_rules
   )
-
-
 }
 
 data "aws_caller_identity" "current" {}
@@ -32,9 +30,10 @@ data "aws_region" "current" {}
 resource "aws_cloudwatch_event_rule" "this" {
   for_each = local.event_rules
 
-  name = "${var.name}-${each.key}"
+  name        = "${var.name}-${each.key}"
+  description = "Event rule for ${each.key}"
   event_pattern = jsonencode({
-    source      = [try(each.value.source, "aws.ecs")]
+    source      = ["aws.ecs"]
     detail-type = each.value.detail-type
     detail      = each.value.detail
   })
@@ -45,60 +44,139 @@ resource "aws_cloudwatch_event_rule" "this" {
 resource "aws_cloudwatch_event_target" "this" {
   for_each = local.event_rules
 
-  target_id = "${var.name}-${each.key}"
-  arn       = module.amazon_q_notifications.lambda_function_arn
   rule      = aws_cloudwatch_event_rule.this[each.key].name
+  target_id = "${var.name}-${each.key}"
+  arn       = aws_sns_topic.prod_chatbot.arn
+
+  dynamic "input_transformer" {
+    for_each = each.key == "ECSTaskStateChange" ? [1] : []
+    content {
+      input_paths = {
+        "account"              = "$.account"
+        "detail"               = "$.detail"
+        "detail-type"          = "$.detail-type"
+        "id"                   = "$.id"
+        "region"               = "$.region"
+        "resources"            = "$.resources"
+        "time"                 = "$.time"
+        "taskDefinitionArn"    = "$.detail.taskDefinitionArn"
+        "lastStatus"           = "$.detail.lastStatus"
+        "desiredStatus"        = "$.detail.desiredStatus"
+        "containerInstanceArn" = "$.detail.containerInstanceArn"
+        "healthStatus"         = "$.detail.healthStatus"
+        "stopCode"             = "$.detail.stopCode"
+        "stoppedReason"        = "$.detail.stoppedReason"
+        "containers"           = "$.detail.containers"
+      }
+      input_template = <<EOF
+{
+  "version": "1.0",
+  "source": "custom",
+  "id": <id>,
+  "content": {
+    "textType": "client-markdown",
+    "title": <detail-type>,
+    "description": "*Event Detail:* \r\n• Task Definition: <taskDefinitionArn>\r\n• Last: <lastStatus>\r\n• Desired: <desiredStatus>",
+    "keywords": [<region>]
+  },
+  "metadata": {
+    "threadId": <id>,
+    "summary": <detail-type>,
+    "eventType": <detail-type>,
+    "relatedResources": <resources>,
+    "additionalContext": {
+      "account": <account>,
+      "time": <time>
+    }
+  }
 }
-
-module "amazon_q_notifications" {
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "7.0.0"
-
-  function_name = var.name
-  role_name     = var.role_name
-  create_role   = true
-  description   = "Receive events from EventBridge and send them to Amazon Q"
-  handler       = "amazon_q_notifications.lambda_handler"
-  source_path   = "${path.module}/functions/amazon_q_notifications.py"
-  runtime       = "python3.10"
-  timeout       = 30
-  publish       = true
-
-  memory_size = var.lambda_memory_size
-
-  recreate_missing_package = var.recreate_missing_package
-
-  allowed_triggers = {
-    for rule, params in local.event_rules : rule => {
-      principal    = "events.amazonaws.com"
-      source_arn   = aws_cloudwatch_event_rule.this[rule].arn
-      statement_id = "AllowExecutionFrom${rule}"
+EOF
     }
   }
 
-  # Add IAM policy for SNS publish
-  attach_policy_jsons = true
-  policy_jsons = [jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "sns:Publish"
-        ]
-        Resource = [aws_sns_topic.prod_chatbot.arn]
+  dynamic "input_transformer" {
+    for_each = each.key == "ECSDeploymentStateChange" ? [1] : []
+    content {
+      input_paths = {
+        "account"      = "$.account"
+        "detail"       = "$.detail"
+        "detail-type"  = "$.detail-type"
+        "id"           = "$.id"
+        "region"       = "$.region"
+        "resources"    = "$.resources"
+        "time"         = "$.time"
+        "eventType"    = "$.detail.eventType"
+        "eventName"    = "$.detail.eventName"
+        "deploymentId" = "$.detail.deploymentId"
+        "reason"       = "$.detail.reason"
       }
-    ]
-  })]
-
-  environment_variables = {
-    LOG_EVENTS    = true
-    LOG_LEVEL     = "INFO"
-    SNS_TOPIC_ARN = aws_sns_topic.prod_chatbot.arn
+      input_template = <<EOF
+{
+  "version": "1.0",
+  "source": "custom",
+  "id": <id>,
+  "content": {
+    "textType": "client-markdown",
+    "title": <detail-type>,
+    "description": "*Event Detail:* \r\n• <eventType> - <eventName>\r\n• Deployment: <deploymentId>\r\n• Reason: <reason>",
+    "keywords": [<region>]
+  },
+  "metadata": {
+    "threadId": <id>,
+    "summary": <detail-type>,
+    "eventType": <detail-type>,
+    "relatedResources": <resources>,
+    "additionalContext": {
+      "account": <account>,
+      "time": <time>
+    }
   }
-  cloudwatch_logs_retention_in_days = var.cloudwatch_logs_retention_in_days
-  tags                              = var.tags
 }
+EOF
+    }
+  }
+
+  dynamic "input_transformer" {
+    for_each = each.key == "ECSServiceAction" ? [1] : []
+    content {
+      input_paths = {
+        "account"     = "$.account"
+        "detail"      = "$.detail"
+        "detail-type" = "$.detail-type"
+        "id"          = "$.id"
+        "region"      = "$.region"
+        "resources"   = "$.resources"
+        "time"        = "$.time"
+        "eventType"   = "$.detail.eventType"
+        "eventName"   = "$.detail.eventName"
+      }
+      input_template = <<EOF
+{
+  "version": "1.0",
+  "source": "custom",
+  "id": <id>,
+  "content": {
+    "textType": "client-markdown",
+    "title": <detail-type>,
+    "description": "*Event Detail:* \r\n• <eventType> - <eventName>",
+    "keywords": [<region>]
+  },
+  "metadata": {
+    "threadId": <id>,
+    "summary": <detail-type>,
+    "eventType": <detail-type>,
+    "relatedResources": <resources>,
+    "additionalContext": {
+      "account": <account>,
+      "time": <time>
+    }
+  }
+}
+EOF
+    }
+  }
+}
+
 
 
 
