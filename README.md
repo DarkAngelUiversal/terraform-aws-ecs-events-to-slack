@@ -1,7 +1,7 @@
 [![FivexL](https://releases.fivexl.io/fivexlbannergit.jpg)](https://fivexl.io/)
 
 # terraform-aws-ecs-events-to-amazon-q
-Rules for Amazon EventBridge that fetch ECS events and send them to Slack, Teams and Chime
+Rules for Amazon EventBridge that fetch ECS events, transform them and send to Amazon Q via SNS
 
 # AWS Chatbot Integration for Slack, Teams, and Chime
 
@@ -12,8 +12,13 @@ This module provides integration between AWS ECS and various chat platforms (Sla
 - Support for multiple chat platforms:
   - Slack (fully tested and supported)
   - Microsoft Teams (requires paid Microsoft 365 account, configuration not fully tested)
-  - Amazon Chime (no Terraform configuration available yet) 
-
+  - Amazon Chime (no Terraform configuration available yet)
+- Event transformation using EventBridge input transformer with support for:
+  - ECS Task State Changes
+  - ECS Deployment State Changes
+  - ECS Service Actions
+  - Custom events
+- Direct integration with Amazon Q via SNS topic
 
 ### Setting Up AWS Q in Slack
 
@@ -42,7 +47,7 @@ Amazon Chime doesn't have Terraform configuration available yet, so it needs to 
 This part of the module hasn't been tested because Microsoft Teams requires a paid plan to use bot features. Please be aware that some issues might occur.
 
 1. Follow the first step from this guide to set up the client: [Microsoft Teams Setup Guide](https://docs.aws.amazon.com/chatbot/latest/adminguide/teams-setup.html)
-2. Theoretically, by providing the following configuration, the module should handle everything else, but as stated above, it hasn't been tested:
+2. Theoretically, by providing the correct configuration, the module should handle everything else, but as stated above, it hasn't been tested:
 
 ## Example
 ```hcl
@@ -74,6 +79,7 @@ You can find more examples in the [`examples/`](./examples/) directory
 - [Amazon ECS events](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_cwe_events.html)
 - [EventBridge Patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)
 - [Amazon_q custom-notifs](https://docs.aws.amazon.com/chatbot/latest/adminguide/custom-notifs.html)
+- [EventBridge Input Transformation](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-transform-target-input.html)
 
 ## AWS Terraform provier versions
 
@@ -115,9 +121,9 @@ You can find more examples in the [`examples/`](./examples/) directory
 
 ## Inputs
 
-| Name                                                                                                                                                           | Description                                                                                                                                                                                | Type     | Default                                                     | Required |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------- | :------: |
-| <a name="input_cloudwatch_logs_retention_in_days"></a> [cloudwatch\_logs\_retention\_in\_days](#input\_cloudwatch\_logs\_retention\_in\_days)                  | Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653. | `number` | `14`                                                        |    no    |
-| <a name="input_custom_event_rules"></a> [custom\_event\_rules](#input\_custom\_event\_rules)                                                                   | A map of objects representing the custom EventBridge rule which will be created in addition to the default rules.                                                                          | `any`    | `{}`                                                        |    no    |
-| <a name="input_ecs_deployment_state_event_rule_detail"></a> [ecs\_deployment\_state\_event\_rule\_detail](#input\_ecs\_deployment\_state\_event\_rule\_detail) | The content of the `detail` section in the EvenBridge Rule for `ECS Deployment State Change` events. Use it to filter the events which will be processed and sent to Slack.                | `any`    | <pre>{<br>  "eventType": [<br>    "ERROR"<br>  ]<br>}</pre> |    no    |
-| <a name="input_ecs_service_action_event_rule_detail"></a> [ecs\_service\_action\_event\_rule\_detail](#input\_ecs\_service\_action\_event\_rule\_detail)       | The content of the `detail` section in the EvenBridge Rule for `ECS Service Action` events. Use it to filter the events which will be processed and sent to Slack.                         | `any`    |
+| Name                                                                                                                                                           | Description                                                                                                                                                                                | Type     | Default                                                                    | Required |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------- | :------: |
+| <a name="input_cloudwatch_logs_retention_in_days"></a> [cloudwatch\_logs\_retention\_in\_days](#input\_cloudwatch\_logs\_retention\_in\_days)                  | Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653. | `number` | `14`                                                                       |    no    |
+| <a name="input_custom_event_rules"></a> [custom\_event\_rules](#input\_custom\_event\_rules)                                                                   | A map of objects representing the custom EventBridge rule which will be created in addition to the default rules.                                                                          | `any`    | `{}`                                                                       |    no    |
+| <a name="input_ecs_deployment_state_event_rule_detail"></a> [ecs\_deployment\_state\_event\_rule\_detail](#input\_ecs\_deployment\_state\_event\_rule\_detail) | The content of the `detail` section in the EvenBridge Rule for `ECS Deployment State Change` events. Use it to filter the events which will be processed and sent to Slack.                | `any`    | <pre>{<br>  "eventType": [<br>    "ERROR"<br>  ]<br>}</pre>                |    no    |
+| <a name="input_ecs_service_action_event_rule_detail"></a> [ecs\_service\_action\_event\_rule\_detail](#input\_ecs\_service\_action\_event\_rule\_detail)       | The content of the `detail` section in the EvenBridge Rule for `ECS Service Action` events. Use it to filter the events which will be processed and sent to Slack.                         | `any`    | <pre>{<br>  "eventType": [<br>    "WARN",<br>    "ERROR"<br>  ]<br>}</pre> |    no    |

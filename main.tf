@@ -76,7 +76,7 @@ resource "aws_cloudwatch_event_target" "this" {
   "content": {
     "textType": "client-markdown",
     "title": <detail-type>,
-    "description": "*Event Detail:* \r\n• Task Definition: <taskDefinitionArn>\r\n• Last: <lastStatus>\r\n• Desired: <desiredStatus>",
+    "description": "*Event Detail:* \r\n• Task Definition: <taskDefinitionArn>\r\n• Last: <lastStatus>\r\n• Desired: <desiredStatus> \r\n• account: <account> \r\n• time: <time>",
     "keywords": [<region>]
   },
   "metadata": {
@@ -118,7 +118,7 @@ EOF
   "content": {
     "textType": "client-markdown",
     "title": <detail-type>,
-    "description": "*Event Detail:* \r\n• <eventType> - <eventName>\r\n• Deployment: <deploymentId>\r\n• Reason: <reason>",
+    "description": "*Event Detail:* \r\n• <eventType> - <eventName>\r\n• Deployment: <deploymentId>\r\n• Reason: <reason> \r\n• account: <account> \r\n• time: <time>",
     "keywords": [<region>]
   },
   "metadata": {
@@ -158,7 +158,7 @@ EOF
   "content": {
     "textType": "client-markdown",
     "title": <detail-type>,
-    "description": "*Event Detail:* \r\n• <eventType> - <eventName>",
+    "description": "*Event Detail:* \r\n• <eventType> - <eventName> \r\n• account: <account> \r\n• time: <time>",
     "keywords": [<region>]
   },
   "metadata": {

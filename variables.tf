@@ -95,7 +95,7 @@ variable "slack_config" {
 }
 
 variable "teams_config" {
-  description = "Microsoft Teams configuration"
+  description = "teams configuration, example: teams_config= {team_id = '' channel_id = '' teams_tenant_id = ''}"
   type        = any
   default     = {}
 }
