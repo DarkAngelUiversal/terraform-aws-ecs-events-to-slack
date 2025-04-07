@@ -20,48 +20,57 @@ variable "role_name" {
 }
 
 variable "enable_ecs_task_state_event_rule" {
-  description = "Enable ECS task state change event rule"
+  description = "The boolean flag enabling the EvenBridge Rule for `ECS Task State Change` events. The `detail` section of this rule is configured with `ecs_task_state_event_rule_detail` variable."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_ecs_deployment_state_event_rule" {
-  description = "Enable ECS deployment state change event rule"
+  description = "The boolean flag enabling the EvenBridge Rule for `ECS Deployment State Change` events. The `detail` section of this rule is configured with `ecs_deployment_state_event_rule_detail` variable."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_ecs_service_action_event_rule" {
-  description = "Enable ECS service action event rule"
+  description = "The boolean flag enabling the EvenBridge Rule for `ECS Service Action` events. The `detail` section of this rule is configured with `ecs_service_action_event_rule_detail` variable."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "ecs_task_state_event_rule_detail" {
-  description = "ECS task state change event rule detail"
-  type        = map(list(string))
-  default     = {}
+  description = "The content of the `detail` section in the EvenBridge Rule for `ECS Task State Change` events. Use it to filter the events which will be processed and sent to Slack."
+  type        = any
+  default = {
+    lastStatus    = ["STOPPED"]
+    stoppedReason = [{ "anything-but" : { "prefix" : "Scaling activity initiated by (deployment ecs-svc/" } }] # skip task stopped events triggerd by deployments
+  }
 }
 
 variable "ecs_deployment_state_event_rule_detail" {
-  description = "ECS deployment state change event rule detail"
-  type        = map(list(string))
-  default     = {}
+  description = "The content of the `detail` section in the EvenBridge Rule for `ECS Deployment State Change` events. Use it to filter the events which will be processed and sent to Slack."
+  type        = any
+  default = {
+    eventType = ["ERROR"]
+  }
 }
 
 variable "ecs_service_action_event_rule_detail" {
-  description = "ECS service action event rule detail"
-  type        = map(list(string))
-  default     = {}
+  description = "The content of the `detail` section in the EvenBridge Rule for `ECS Service Action` events. Use it to filter the events which will be processed and sent to Slack."
+  type        = any
+  default = {
+    eventType = ["WARN", "ERROR"]
+  }
 }
 
 variable "custom_event_rules" {
-  description = "Custom event rules"
-  type = map(object({
-    detail-type = list(string)
-    detail      = map(list(string))
-  }))
-  default = {}
+  description = "A map of objects representing the custom EventBridge rule which will be created in addition to the default rules."
+  type        = any
+  default     = {}
+
+  validation {
+    error_message = "Each rule object should have both 'detail' and 'detail-type' keys."
+    condition     = alltrue([for name, rule in var.custom_event_rules : length(setintersection(keys(rule), ["detail", "detail-type"])) == 2])
+  }
 }
 
 variable "tags" {
