@@ -16,7 +16,19 @@ variable "name" {
 variable "role_name" {
   description = "The string which will be used for the name of Lambda IAM role"
   type        = string
-  default     = null
+  default     = ""
+}
+
+variable "aws_sns_topic_name" {
+  description = "Name for aws sns topic"
+  type        = string
+  default     = "aws-eventbridge-to-amazon-q"
+}
+
+variable "sns_topic_arn" {
+  description = "The ARN of the SNS topic used for notifications"
+  type        = string
+  default     = ""
 }
 
 variable "enable_ecs_task_state_event_rule" {
@@ -91,20 +103,4 @@ variable "cloudwatch_logs_retention_in_days" {
   default     = 14
 }
 
-variable "lambda_memory_size" {
-  description = "Amount of memory in MB your Lambda Function can use at runtime. Valid value between 128 MB to 10,240 MB (10 GB), in 64 MB increments."
-  type        = number
-  default     = 256
-}
 
-variable "slack_config" {
-  description = "Slack configuration, example: slack_config= {channel_id = '' workspace_id = ''}"
-  type        = any
-  default     = {}
-}
-
-variable "teams_config" {
-  description = "teams configuration, example: teams_config= {team_id = '' channel_id = '' teams_tenant_id = ''}"
-  type        = any
-  default     = {}
-}

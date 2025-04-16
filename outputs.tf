@@ -1,4 +1,4 @@
 output "sns_topic_arn" {
-  description = "The ARN of the SNS topic used for notifications"
-  value       = aws_sns_topic.prod_chatbot.arn
-} 
+  description = "ARN create SNS topic"
+  value       = var.sns_topic_arn == "" ? aws_sns_topic.this[0].arn : var.sns_topic_arn
+}

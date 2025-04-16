@@ -46,7 +46,7 @@ resource "aws_cloudwatch_event_target" "this" {
 
   rule      = aws_cloudwatch_event_rule.this[each.key].name
   target_id = "${var.name}-${each.key}"
-  arn       = aws_sns_topic.prod_chatbot.arn
+  arn       = var.sns_topic_arn != "" ? var.sns_topic_arn : aws_sns_topic.this.arn
 
   dynamic "input_transformer" {
     for_each = each.key == "ECSTaskStateChange" ? [1] : []
