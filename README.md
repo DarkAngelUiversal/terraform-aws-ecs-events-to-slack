@@ -2,7 +2,7 @@
 
 # terraform-aws-ecs-events-to-slack
 
-Module for creating EventBridge rules that capture ECS events, format them, and send them to an SNS topic.
+This module helps you to send AWS EventBrige events to Slack / Microsoft teams /Amazon Chine
 
 ## Description
 
@@ -11,7 +11,7 @@ This module creates EventBridge rules (`aws_cloudwatch_event_rule`) that:
 2. Format them using `input_transformer` into the required format
 3. Send them to a specified SNS topic
 
-The SNS topic sends messages to Amazon Q, which then distributes them to:
+The SNS topic sends messages to Amazon Q Developer, which then distributes them to:
 - Slack
 - Amazon Chime
 - Microsoft Teams
@@ -21,7 +21,7 @@ The SNS topic sends messages to Amazon Q, which then distributes them to:
 - ECS Task State Changes
 - ECS Deployment State Changes
 - ECS Service Actions
-- Custom events
+
 
 ## Usage Example
 
@@ -38,7 +38,7 @@ module "ecs_to_slack" {
   clusterArn = ["arn:aws:ecs:us-east-1:123456789012:your-cluster/services"]
   }
 
-  # SNS topic ARN for sending notifications to Amazon Q
+  # SNS topic ARN for sending notifications to Amazon Q Developer
   sns_topic_arn = "arn:aws:sns:region:account-id:topic-name"
 }
 ```
@@ -52,19 +52,19 @@ module "ecs_to_slack" {
 
 ## Inputs
 
-| Name                                   | Description                                         | Type        | Default | Required |
-| -------------------------------------- | --------------------------------------------------- | ----------- | ------- | :------: |
-| name                                   | Name for all resources                              | string      | -       |   yes    |
-| sns_topic_arn                          | SNS topic ARN for sending notifications to Amazon Q | string      | -       |   yes    |
-| enable_ecs_task_state_event_rule       | Enable rule for ECS task state change events        | bool        | true    |    no    |
-| enable_ecs_deployment_state_event_rule | Enable rule for ECS deployment state change events  | bool        | true    |    no    |
-| enable_ecs_service_action_event_rule   | Enable rule for ECS service action events           | bool        | true    |    no    |
-| custom_event_rules                     | Custom event rules                                  | any         | {}      |    no    |
-| tags                                   | Tags for all resources                              | map(string) | {}      |    no    |
+| Name                                   | Description                                                   | Type        | Default | Required |
+| -------------------------------------- | ------------------------------------------------------------- | ----------- | ------- | :------: |
+| name                                   | Name for all resources                                        | string      | -       |   yes    |
+| sns_topic_arn                          | SNS topic ARN for sending notifications to Amazon Q Developer | string      | -       |   yes    |
+| enable_ecs_task_state_event_rule       | Enable rule for ECS task state change events                  | bool        | true    |    no    |
+| enable_ecs_deployment_state_event_rule | Enable rule for ECS deployment state change events            | bool        | true    |    no    |
+| enable_ecs_service_action_event_rule   | Enable rule for ECS service action events                     | bool        | true    |    no    |
+| custom_event_rules                     | Custom event rules                                            | any         | {}      |    no    |
+| tags                                   | Tags for all resources                                        | map(string) | {}      |    no    |
 
 ## Message Format
 
-The module formats events into the following format that is compatible with Amazon Q:
+The module formats events into the following format that is compatible with Amazon Q Developer:
 
 ```json
 {
@@ -95,7 +95,7 @@ The module formats events into the following format that is compatible with Amaz
 - [ECS Events Documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_cwe_events.html)
 - [EventBridge Patterns](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)
 - [EventBridge Input Transformation](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-transform-target-input.html)
-- [Amazon Q Documentation](https://docs.aws.amazon.com/chatbot/latest/adminguide/what-is-chatbot.html)
+- [Amazon Q Developer Documentation](https://docs.aws.amazon.com/chatbot/latest/adminguide/what-is-chatbot.html)
 
 ## AWS Terraform Provider Versions
 
@@ -115,12 +115,6 @@ The module formats events into the following format that is compatible with Amaz
 | Name                                              | Version |
 | ------------------------------------------------- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.69 |
-
-## Modules
-
-| Name                                                                                            | Source                           | Version |
-| ----------------------------------------------------------------------------------------------- | -------------------------------- | ------- |
-| <a name="module_slack_notifications"></a> [slack\_notifications](#module\_slack\_notifications) | terraform-aws-modules/lambda/aws | 5.0.0   |
 
 ## Resources
 

@@ -33,7 +33,7 @@ resource "aws_cloudwatch_event_rule" "this" {
   name        = "${var.name}-${each.key}"
   description = "Event rule for ${each.key}"
   event_pattern = jsonencode({
-    source = [try(each.value.source, "aws.ecs")]
+    source      = [try(each.value.source, "aws.ecs")]
     detail-type = each.value.detail-type
     detail      = each.value.detail
   })

@@ -13,16 +13,10 @@ variable "name" {
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "role_name" {
-  description = "The string which will be used for the name of Lambda IAM role"
-  type        = string
-  default     = ""
-}
-
 variable "aws_sns_topic_name" {
   description = "Name for aws sns topic"
   type        = string
-  default     = "aws-eventbridge-to-amazon-q"
+  default     = "aws-eventbridge-to-amazon-q-developer"
 }
 
 variable "sns_topic_arn" {
@@ -89,12 +83,6 @@ variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
   default     = {}
-}
-
-variable "recreate_missing_package" {
-  description = "Whether to recreate missing Lambda package if it is missing locally or not."
-  type        = bool
-  default     = true
 }
 
 variable "cloudwatch_logs_retention_in_days" {

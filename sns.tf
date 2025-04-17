@@ -3,9 +3,10 @@ resource "aws_sns_topic" "this" {
   name  = var.aws_sns_topic_name
   tags  = var.tags
 }
+
 resource "aws_sns_topic_policy" "this" {
   count = var.sns_topic_arn == "" ? [0] : [1]
-  arn = aws_sns_topic.this.arn
+  arn   = aws_sns_topic.this.arn
 
   policy = jsonencode({
     Version = "2012-10-17"
