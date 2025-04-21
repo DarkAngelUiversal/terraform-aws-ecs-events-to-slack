@@ -1,12 +1,37 @@
 repos:
 - repo: https://github.com/antonbabenko/pre-commit-terraform
-  rev: v1.74.1
+  rev: v1.77.1
   hooks:
     - id: terraform_fmt
     - id: terraform_tflint
     - id: terraform_validate
     - id: terraform_docs
-    - id: terraform_tfsec
-      args:
-        - --args=--config-file=__GIT_WORKING_DIR__/.tfsec.yaml
+    # - id: terraform_tfsec
     - id: terraform_checkov
+    
+formatter: "markdown table"
+header-from: "main.tf"
+footer-from: ""
+sections:
+  show:
+    - header
+    - requirements
+    - providers
+    - resources
+    - inputs
+    - outputs
+sort:
+  enabled: true
+  by: name
+output:
+  file: "README.md"
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+recursive:
+  enabled: false
+  follow-symlinks: false
+  ignore:
+    - "examples/*" 

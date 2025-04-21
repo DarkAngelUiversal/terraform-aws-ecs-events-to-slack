@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.0.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 3.69.0"
+    }
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -7,9 +17,8 @@ data "aws_ecs_cluster" "this" {
 }
 
 module "ecs_to_slack" {
-  source            = "../terraform-aws-ecs-events-to-slack"
-  name              = "amazon_q_notifications"
-  
+  source = "../../"
+  name   = "amazon_q_notifications"
 
   # Do not create any built-in rule
   ecs_task_state_event_rule_detail       = {}
@@ -26,15 +35,5 @@ module "ecs_to_slack" {
         status     = [{ "anything-but" = "ACTIVE" }]  # except events with status = ACTIVE
       }
     }
-  slack_config = {
-    channel_id   = "1234567890"  # Your Slack workspace ID
-    workspace_id = "1234567890"   # Your Slack channel ID
-  }
-  #Testing is required for teams
-  # teams_config = {
-  #   team_id         = "1234567890" # Your Teams id ID
-  #   channel_id      = "1234567890" # Your Teams channel ID
-  #   teams_tenant_id = "1234567890" # Your Teams tenant ID
-  # }
   }
 }

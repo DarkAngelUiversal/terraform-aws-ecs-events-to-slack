@@ -7,6 +7,12 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  statuses: write
+
 jobs:
   python-job:
     uses: fivexl/github-reusable-workflows/.github/workflows/python-job.yml@main
