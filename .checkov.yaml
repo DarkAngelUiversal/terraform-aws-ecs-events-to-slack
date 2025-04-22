@@ -1,4 +1,0 @@
-soft-fail: true
-skip-check:
-  - CKV_AWS_26  # SNS topic should be encrypted
-  - CKV_AWS_27  # Ensure all data stored in the SNS topic is encrypted 

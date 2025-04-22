@@ -6,7 +6,7 @@ This module helps you to send AWS EventBrige events to Slack / Microsoft teams /
 
 ## Description
 
-This module creates EventBridge rules (`aws_cloudwatch_event_rule`) that:
+This module creates EventBridge rules `aws_cloudwatch_event_rule` that:
 1. Capture ECS events
 2. Format them using `input_transformer` into the required format
 3. Send them to a specified SNS topic

@@ -28,3 +28,11 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Ignore executable files
+tflint.exe
+tfsec.exe
+
+# Lambda directories
+builds/
+__pycache__/

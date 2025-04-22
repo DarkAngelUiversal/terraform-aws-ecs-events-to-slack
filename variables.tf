@@ -6,6 +6,7 @@
 variable "name" {
   description = "Name to be used on all the resources as identifier"
   type        = string
+  default     = "aws-eventbridge-to-amazon-q-developer"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -13,14 +14,10 @@ variable "name" {
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "aws_sns_topic_name" {
-  description = "Name for aws sns topic"
-  type        = string
-  default     = "aws-eventbridge-to-amazon-q-developer"
-}
+
 
 variable "sns_topic_arn" {
-  description = "The ARN of the SNS topic used for notifications"
+  description = "The ARN of the SNS topic used for notifications, If not provided, topic will create SNS topic it self"
   type        = string
   default     = ""
 }
