@@ -94,7 +94,7 @@ The module formats events into the following format that is compatible with Amaz
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.92.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.69 |
 
 ## Modules
 

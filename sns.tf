@@ -1,12 +1,7 @@
 resource "aws_sns_topic" "this" {
-  #tfsec:ignore:aws-sns-topic-encryption-use-cmk
-  #checkov:skip=CKV_AWS_26:Ensure all data stored in the SNS topic is encrypted
-  #checkov:skip=CKV_AWS_27:Ensure all data stored in the SNS topic is encrypted
   count = var.sns_topic_arn == "" ? 1 : 0
   name  = var.name
   tags  = var.tags
-
-  # kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_policy" "this" {
